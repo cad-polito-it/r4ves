@@ -1,0 +1,29 @@
+StatusDefinitions{
+
+    Redefine DT DX "Redefine DT";
+    Redefine ND NX "Redefine ND";
+
+    U1 "Error: Undefined (default)";
+    U2 "Error: End not reached";
+    U3 "Error: Data Bus Read";
+    U4 "Error: Data Bus Write";
+    U5 "Error: Exception Occured";
+    U6 "Reserved";
+    U7 "Result: x1 no difference";
+    U8 "Result: x1 has difference (defined)";
+    U9 "Result: x1 has difference (undefined)";
+
+    DefaultStatus(U1)
+    Selected(NA,U1,U2,U3,U4,U5,U6,U7,U8,U9)
+
+    PromotionTable
+    {
+        PromoteOrder(NA<U1<U6<U5<U2<U3<U4<U7<U9<U8)
+    }
+
+}
+
+FaultGenerate
+{
+    NA [0,1] { PORT "rv_testbench.dut.**" }
+}

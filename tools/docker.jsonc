@@ -1,0 +1,21 @@
+{
+    "native-commands": {
+        "riscv-gcc":     ["source", "/software/load-gcc-riscv-elf-<YOUR_TOOL_HERE>.sh", ";", "riscv-unknown-elf-gcc"],
+        "riscv-objcopy": ["source", "/software/load-gcc-riscv-elf-<YOUR_TOOL_HERE>.sh", ";", "riscv-unknown-elf-objcopy"],
+        "riscv-objdump": ["source", "/software/load-gcc-riscv-elf-<YOUR_TOOL_HERE>.sh", ";", "riscv-unknown-elf-objdump"],
+        "modelsim-vlib": ["source", "/software/load-modelsim-<YOUR_TOOL_HERE>.sh", ";", "vlib"],
+        "modelsim-vlog": ["source", "/software/load-modelsim-<YOUR_TOOL_HERE>.sh", ";", "vlog"],
+        "modelsim-vcom": ["source", "/software/load-modelsim-<YOUR_TOOL_HERE>.sh", ";", "vcom"],
+        "modelsim-vopt": ["source", "/software/load-modelsim-<YOUR_TOOL_HERE>.sh", ";", "vopt"],
+        "modelsim-vsim": ["source", "/software/load-modelsim-<YOUR_TOOL_HERE>.sh", ";", "vsim"],
+    },
+    "docker-commands": {
+        "zoix-zoix":     ["sudo", "docker", "run", "--rm", "--tty", "--mount", "type=bind,src=/software/zoix-<YOUR_TOOL_HERE>, dst=/zoix", "--mount", "type=bind,src=%DATA_DIR%,dst=/data", "--workdir=%WORK_DIR%", "<YOUR_IMAGE_HERE>:latest", "/zoix/bin/zoix"],
+        "zoix-fr2fdef":  ["sudo", "docker", "run", "--rm", "--tty", "--mount", "type=bind,src=/software/zoix-<YOUR_TOOL_HERE>, dst=/zoix", "--mount", "type=bind,src=%DATA_DIR%,dst=/data", "--workdir=%WORK_DIR%", "<YOUR_IMAGE_HERE>:latest", "/zoix/bin/fr2fdef"],
+        "zoix-frep":     ["sudo", "docker", "run", "--rm", "--tty", "--mount", "type=bind,src=/software/zoix-<YOUR_TOOL_HERE>, dst=/zoix", "--mount", "type=bind,src=%DATA_DIR%,dst=/data", "--workdir=%WORK_DIR%", "<YOUR_IMAGE_HERE>:latest", "/zoix/bin/fault_report"],
+        "zoix-sim":      ["sudo", "docker", "run", "--rm", "--tty", "--mount", "type=bind,src=/software/zoix-<YOUR_TOOL_HERE>, dst=/zoix", "--mount", "type=bind,src=%DATA_DIR%,dst=/data", "--workdir=%WORK_DIR%", "<YOUR_IMAGE_HERE>:latest", "./zoix.sim"],
+        "zoix-fmsh":     ["sudo", "docker", "run", "--rm", "--tty", "--mount", "type=bind,src=/software/zoix-<YOUR_TOOL_HERE>, dst=/zoix", "--mount", "type=bind,src=%DATA_DIR%,dst=/data", "--workdir=%WORK_DIR%", "<YOUR_IMAGE_HERE>:latest", "/zoix/bin/fmsh"],
+    },
+    "docker-mount": "/data",
+    "docker-images": ["<YOUR_IMAGE_HERE>"]
+}

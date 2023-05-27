@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true,
+	},
+	"extensions": {
+		"recommendations": [
+			"mshr-h.veriloghdl",
+			"ms-python.python"
+		]
+	}
+}

@@ -1,0 +1,25 @@
+logging(file=[%log_file%])
+
+set(var=[resources], messages=[all]) # Enable Fault Manager Verbosity
+set(var=[defines], format=[standard]) # Enhanced Synopsys format
+set(var=[defines], dictionary.enable=[1]) # Enable Dictionary Report for Fault Coverage (with format=standard only)
+set(var=[defines], dictionary.values.base=[binary]) # Fault dictionary in binary 
+set(var=[defines], fault.inject.sync=[1]) # Inject faults at the end of the time step
+set(var=[defines], progress.enable=[1], progress.limit=[300]) # Enable progress messages during toggle and fault simulation every progress.limit seconds.
+set(var=[defines], progress.style=[long]) # Set the verbosity of progress messages to be extensive.
+set(var=[fdef], method=[fr], fr.fr=[%faults_file%], abort=[error]) # Import the generated fault list and abort on error.
+set(var=[fsim], hyperfault=[0]) # Disable Hyperfaults
+set(var=[fsim], output=[1]) # Enable $display statements during fsim
+
+design() # Load design into the fault manager
+addtst(
+    test=[rv_testbench],
+    stimtype=[tb],
+    stim_options=[%options%],
+    interactive.file=[%init_file%]
+)
+fsim(test=[rv_testbench])
+fsimlog(test=[rv_testbench])
+
+coverage(file=[%coverage_file%])
+summary(file=[%summary_file%])

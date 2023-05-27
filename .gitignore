@@ -1,0 +1,8 @@
+# exclude generated data
+run
+output
+*.vcd
+
+# other things
+sources/rtl/picorv32
+sources/rtl/darkriscv

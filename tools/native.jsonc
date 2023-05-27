@@ -1,0 +1,20 @@
+{
+    "native-commands": {
+        "riscv-gcc":     ["riscv32-unknown-elf-gcc"],
+        "riscv-objcopy": ["riscv32-unknown-elf-objcopy"],
+        "riscv-objdump": ["riscv32-unknown-elf-objdump"],
+        "modelsim-vlib": ["vlib"],
+        "modelsim-vlog": ["vlog"],
+        "modelsim-vcom": ["vcom"],
+        "modelsim-vopt": ["vopt"],
+        "modelsim-vsim": ["vsim"],
+        "zoix-zoix":     ["zoix"],
+        "zoix-fr2fdef":  ["fr2fdef"],
+        "zoix-frep":     ["fault_report"],
+        "zoix-sim":      ["./zoix.sim"],
+        "zoix-fmsh":     ["fmsh"],
+    },
+    "docker-commands": {},
+    "docker-mount": "",
+    "docker-images": []
+}

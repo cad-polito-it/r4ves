@@ -1,0 +1,289 @@
+{
+    "name": "darkriscv-rv32e",
+    "sources": {
+        "rtl": {
+            "defines": {
+                "__RESETPC__": "32'd0",
+                "__RESETSP__": "32'd8192",
+                "__3STAGE__": "yes",
+                "__HARVARD__": "yes",
+                "__RV32E__": "yes"
+            },
+            "sources": [
+                { "type": "verilog", "file": "sources/rtl/darkriscv/rtl/darkriscv.v" }
+            ]
+        },
+        "gate": {
+            "sources": [
+                { "type": "verilog", "file": "sources/gate_level/darkriscv-rv32e-nangate.v" }
+            ]
+        },
+        "technology": {
+            "defines": {
+                "functional": "yes"
+            },
+            "sources": [
+                { "type": "verilog", "file": "sources/tech_libs/NangateOpenCellLibrary.v" }
+            ]
+        },
+        "testbench": {
+            "defines": {
+                "TESTBENCH_CLOCK_PERIOD_NS": "2",
+                "TESTBENCH_RESET_CYCLES": "10",
+                "TESTBENCH_TARGET_DARKRISCV": "yes",
+                "MEMORY_ADDRESS_BITS": "16",
+                "MEMORY_DUAL_PORT": "yes"
+            },
+            "environment": [
+                { "name": "RISCV_RVE", "type": "value", "value": "yes" }
+            ],
+            "sources": [
+                { "type": "system-verilog", "file": "sources/testbench/tb_ram_generic.sv" },
+                { "type": "system-verilog", "file": "sources/testbench/tb_ram_darkriscv.sv" },
+                { "type": "system-verilog", "file": "sources/testbench/tb_top.sv" }
+            ]
+        },
+        "strobe": {
+            "defines": {
+                "STROBE_TARGET_DARKRISCV": "yes"
+            },
+            "sources": [
+                { "type": "system-verilog", "file": "sources/zoix/strobe.sv" }
+            ]
+        },
+        "init-program": {
+            "defines": {
+                "RISCV_RVE": "yes"
+            },
+            "sources": [
+                { "type": "assembly", "file": "sources/sbst/init-regfile.asm" },
+                { "type": "linker", "file": "sources/sbst/darkriscv-rv32e.ld" }
+            ]
+        },
+        "sbst-program": {
+            "defines": {
+                "RISCV_RVE": "yes"
+            },
+            "sources": [
+                { "type": "assembly", "file": "sources/sbst/darkriscv-rv32e.asm" },
+                { "type": "linker", "file": "sources/sbst/darkriscv-rv32e.ld" }
+            ]
+        }
+    },
+    "tasks": {
+        "compile-init": {
+            "description": "Cross-compiles the initialization program for RISC-V",
+            "target": "gcc-compile",
+            "sources": [ "init-program" ],
+            "configuration": {
+                "machine-architecture": "rv32e",
+                "machine-abi": "ilp32e",
+                "elf-file": "output/darkriscv-rv32e/init.elf",
+                "hex-file": "output/darkriscv-rv32e/init.hex",
+                "map-file": "output/darkriscv-rv32e/init.map",
+                "addresses-file": "output/darkriscv-rv32e/init.addresses"
+            }
+        },
+        "compile-sbst": {
+            "description": "Cross-compiles the SBST program for RISC-V",
+            "target": "gcc-compile",
+            "sources": [ "sbst-program" ],
+            "configuration": {
+                "machine-architecture": "rv32e",
+                "machine-abi": "ilp32e",
+                "elf-file": "output/darkriscv-rv32e/sbst.elf",
+                "hex-file": "output/darkriscv-rv32e/sbst.hex",
+                "map-file": "output/darkriscv-rv32e/sbst.map",
+                "addresses-file": "output/darkriscv-rv32e/sbst.addresses"
+            }
+        },
+        "logic-simulation-rtl-gui": {
+            "description": "Run the logic simulation (RTL-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "rtl", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/darkriscv-rv32e/sbst.hex" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses",
+            "commands": [
+                { "type": "file", "path": "sources/wave_config/defaults_simulation.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_testbench.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_core_darkriscv_rtl.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_tracer_darkriscv_rv32e.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_memory.tcl" },
+                { "type": "file", "path": "sources/wave_config/defaults_wave_view.tcl" },
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-gui" }
+            ]
+        },
+        "logic-simulation-rtl-nogui": {
+            "description": "Run the logic simulation (RTL-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "rtl", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_VCD_DUMP": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/darkriscv-rv32e/sbst.hex" },
+                { "name": "dump_vcd", "type": "file", "file": "output/darkriscv-rv32e/sbst.vcd" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-gate-gui": {
+            "description": "Run the logic simulation (Gate-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/darkriscv-rv32e/sbst.hex" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses",
+            "commands": [
+                { "type": "file", "path": "sources/wave_config/defaults_simulation.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_testbench.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_core_generic.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_tracer_darkriscv_rv32e.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_memory.tcl" },
+                { "type": "file", "path": "sources/wave_config/defaults_wave_view.tcl" },
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-gui" }
+            ]
+        },
+        "logic-simulation-gate-nogui": {
+            "description": "Run the logic simulation (Gate-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_VCD_DUMP": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/darkriscv-rv32e/sbst.hex" },
+                { "name": "dump_vcd", "type": "file", "file": "output/darkriscv-rv32e/sbst.vcd" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-extract-initial-state": {
+            "description": "Run the logic simulation (Gate-level) and extract initial state",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "TESTBENCH_PROBES_DUMP": "yes",
+                "TESTBENCH_PROBES_DUMP_SBST_START": "yes",
+                "TESTBENCH_PROBES_DUMP_SBST_START_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/darkriscv-rv32e/init.hex" },
+                { "name": "dump_signals", "type": "file", "file": "sources/gate_level/darkriscv-rv32e-nangate.probes"},
+                { "name": "dump_sbst_start_console", "type": "value", "value": "0"},
+                { "name": "dump_sbst_start_file", "type": "file", "file": "output/darkriscv-rv32e/state.initial"}
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/init.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-zoix": {
+            "description": "Run the logic simulation (Gate-level) with Z01X",
+            "target": "zoix-logic-simulation",
+            "sources": [ "technology", "gate", "testbench", "strobe" ],
+            "configuration": {
+                "faults_file": "sources/zoix/faults-sbst1-dut.sff",
+                "strobe_file": "sources/zoix/untestability.fstrobe",
+                "init_script": "sources/zoix/initialize-testbench.tcl",
+                "memory_file": "output/darkriscv-rv32e/sbst.hex"
+            },
+            "defines": {
+                "STROBE_TIMEOUT": "yes",
+                "STROBE_SBST_OBSERVE": "yes",
+                "STROBE_SBST_TYPE1": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "sbst_end_timeout", "type": "value", "value": "1000" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses"
+        },
+        "fault-simulation-zoix": {
+            "description": "Run the fault simulation (Gate-level) with Z01X",
+            "target": "zoix-fault-simulation",
+            "sources": [ "technology", "gate", "testbench", "strobe" ],
+            "configuration": {
+                "faults_file": "sources/zoix/faults-sbst1-dut.sff",
+                "strobe_file": "sources/zoix/untestability.fstrobe",
+                "init_script": "sources/zoix/initialize-testbench.tcl",
+                "fsim_script": "sources/zoix/fault-simulation.fmsh",
+                "memory_file": "output/darkriscv-rv32e/sbst.hex",
+                "coverage_file": "output/darkriscv-rv32e/sbst.coverage",
+                "summary_file": "output/darkriscv-rv32e/sbst.summary"
+            },
+            "defines": {
+                "STROBE_TIMEOUT": "yes",
+                "STROBE_SBST_OBSERVE": "yes",
+                "STROBE_SBST_TYPE1": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "sbst_end_timeout", "type": "value", "value": "1000" }
+            ],
+            "plusargs_file": "output/darkriscv-rv32e/sbst.addresses"
+        }
+    }
+}

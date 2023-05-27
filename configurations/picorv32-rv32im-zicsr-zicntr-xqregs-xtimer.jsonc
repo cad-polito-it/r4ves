@@ -1,0 +1,310 @@
+{
+    "name": "picorv32-rv32im-zicsr-zicntr-xqregs-xtimer",
+    "sources": {
+        "rtl": {
+            "sources": [
+                { "type": "verilog", "file": "sources/rtl/picorv32/picorv32.v" }
+            ]
+        },
+        "gate": {
+            "sources": [
+                { "type": "verilog", "file": "sources/gate_level/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer-nangate.v" }
+            ]
+        },
+        "technology": {
+            "defines": {
+                "functional": "yes"
+            },
+            "sources": [
+                { "type": "verilog", "file": "sources/tech_libs/NangateOpenCellLibrary.v" }
+            ]
+        },
+        "testbench": {
+            "defines": {
+                "TESTBENCH_CLOCK_PERIOD_NS": "2",
+                "TESTBENCH_RESET_CYCLES": "10",
+                "TESTBENCH_TARGET_PICORV32": "yes",
+                "MEMORY_ADDRESS_BITS": "16",
+                "MEMORY_DUAL_PORT": "yes"
+            },
+            "parameters": {
+                "rv_testbench.dut.ENABLE_COUNTERS": "1",
+                "rv_testbench.dut.ENABLE_COUNTERS64": "1",
+                "rv_testbench.dut.ENABLE_REGS_16_31": "1",
+                "rv_testbench.dut.ENABLE_REGS_DUALPORT": "1",
+                "rv_testbench.dut.LATCHED_MEM_RDATA": "0",
+                "rv_testbench.dut.TWO_STAGE_SHIFT": "1",
+                "rv_testbench.dut.BARREL_SHIFTER": "1",
+                "rv_testbench.dut.TWO_CYCLE_COMPARE": "1",
+                "rv_testbench.dut.TWO_CYCLE_ALU": "1",
+                "rv_testbench.dut.COMPRESSED_ISA": "0",
+                "rv_testbench.dut.CATCH_MISALIGN": "1",
+                "rv_testbench.dut.CATCH_ILLINSN": "1",
+                "rv_testbench.dut.ENABLE_PCPI": "0",
+                "rv_testbench.dut.ENABLE_MUL": "1",
+                "rv_testbench.dut.ENABLE_FAST_MUL": "1",
+                "rv_testbench.dut.ENABLE_DIV": "1",
+                "rv_testbench.dut.ENABLE_IRQ": "1",
+                "rv_testbench.dut.ENABLE_IRQ_QREGS": "1",
+                "rv_testbench.dut.ENABLE_IRQ_TIMER": "1",
+                "rv_testbench.dut.ENABLE_TRACE": "0",
+                "rv_testbench.dut.REGS_INIT_ZERO": "1",
+                "rv_testbench.dut.MASKED_IRQ": "32'h 0000_0000",
+                "rv_testbench.dut.LATCHED_IRQ": "32'h ffff_ffff",
+                "rv_testbench.dut.PROGADDR_RESET": "32'h 0000_0000",
+                "rv_testbench.dut.PROGADDR_IRQ": "32'h 0000_0010",
+                "rv_testbench.dut.STACKADDR": "32'h ffff_ffff"
+            },
+            "environment": [
+                { "name": "RISCV_RVI", "type": "value", "value": "yes" }
+            ],
+            "sources": [
+                { "type": "system-verilog", "file": "sources/testbench/tb_ram_generic.sv" },
+                { "type": "system-verilog", "file": "sources/testbench/tb_ram_picorv32.sv" },
+                { "type": "system-verilog", "file": "sources/testbench/tb_top.sv" }
+            ]
+        },
+        "strobe": {
+            "defines": {
+                "STROBE_TARGET_PICORV32": "yes"
+            },
+            "sources": [
+                { "type": "system-verilog", "file": "sources/zoix/strobe.sv" }
+            ]
+        },
+        "init-program": {
+            "defines": {
+                "RISCV_RVI": "yes"
+            },
+            "sources": [
+                { "type": "assembly", "file": "sources/sbst/init-regfile.asm" },
+                { "type": "linker", "file": "sources/sbst/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer.ld" }
+            ]
+        },
+        "sbst-program": {
+            "defines": {
+                "RISCV_RVI": "yes"
+            },
+            "sources": [
+                { "type": "assembly", "file": "sources/sbst/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer.asm" },
+                { "type": "linker", "file": "sources/sbst/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer.ld" }
+            ]
+        }
+    },
+    "tasks": {
+        "compile-init": {
+            "description": "Cross-compiles the initialization program for RISC-V",
+            "target": "gcc-compile",
+            "sources": [ "init-program" ],
+            "configuration": {
+                "machine-architecture": "rv32i",
+                "machine-abi": "lp32",
+                "elf-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.elf",
+                "hex-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.hex",
+                "map-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.map",
+                "addresses-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.addresses"
+            }
+        },
+        "compile-sbst": {
+            "description": "Cross-compiles the SBST program for RISC-V",
+            "target": "gcc-compile",
+            "sources": [ "sbst-program" ],
+            "configuration": {
+                "machine-architecture": "rv32i",
+                "machine-abi": "lp32",
+                "elf-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.elf",
+                "hex-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex",
+                "map-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.map",
+                "addresses-file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses"
+            }
+        },
+        "logic-simulation-rtl-gui": {
+            "description": "Run the logic simulation (RTL-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "rtl", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses",
+            "commands": [
+                { "type": "file", "path": "sources/wave_config/defaults_simulation.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_testbench.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_core_darkriscv_rtl.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_tracer_picorv32_rv32im_zicsr_zicntr_xqregs_xtimer.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_memory.tcl" },
+                { "type": "file", "path": "sources/wave_config/defaults_wave_view.tcl" },
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-gui" }
+            ]
+        },
+        "logic-simulation-rtl-nogui": {
+            "description": "Run the logic simulation (RTL-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "rtl", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_VCD_DUMP": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex" },
+                { "name": "dump_vcd", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.vcd" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-gate-gui": {
+            "description": "Run the logic simulation (Gate-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses",
+            "commands": [
+                { "type": "file", "path": "sources/wave_config/defaults_simulation.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_testbench.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_core_generic.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_tracer_picorv32_rv32im_zicsr_zicntr_xqregs_xtimer.tcl" },
+                { "type": "file", "path": "sources/wave_config/wave_memory.tcl" },
+                { "type": "file", "path": "sources/wave_config/defaults_wave_view.tcl" },
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-gui" }
+            ]
+        },
+        "logic-simulation-gate-nogui": {
+            "description": "Run the logic simulation (Gate-level)",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_VCD_DUMP": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex" },
+                { "name": "dump_vcd", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.vcd" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-extract-initial-state": {
+            "description": "Run the logic simulation (Gate-level) and extract initial state",
+            "target": "modelsim-logic-simulation",
+            "sources": [ "technology", "gate", "testbench" ],
+            "defines": {
+                "TESTBENCH_TIMEOUT": "yes",
+                "TESTBENCH_SBST_OBSERVE": "yes",
+                "TESTBENCH_SBST_AUTO_EXIT": "yes",
+                "TESTBENCH_PROBES_DUMP": "yes",
+                "TESTBENCH_PROBES_DUMP_SBST_START": "yes",
+                "TESTBENCH_PROBES_DUMP_SBST_START_EXIT": "yes",
+                "MEMORY_ENABLE_LOAD": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "memory_image", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.hex" },
+                { "name": "dump_signals", "type": "file", "file": "sources/gate_level/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer-nangate.probes"},
+                { "name": "dump_sbst_start_console", "type": "value", "value": "0"},
+                { "name": "dump_sbst_start_file", "type": "file", "file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/state.initial"}
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/init.addresses",
+            "commands": [
+                { "type": "command", "command": "run -all" },
+                { "type": "raw", "argument": "-c" }
+            ]
+        },
+        "logic-simulation-zoix": {
+            "description": "Run the logic simulation (Gate-level) with Z01X",
+            "target": "zoix-logic-simulation",
+            "sources": [ "technology", "gate", "testbench", "strobe" ],
+            "configuration": {
+                "faults_file": "sources/zoix/faults-sbst1-dut.sff",
+                "strobe_file": "sources/zoix/untestability.fstrobe",
+                "init_script": "sources/zoix/initialize-testbench.tcl",
+                "memory_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex"
+            },
+            "defines": {
+                "STROBE_TIMEOUT": "yes",
+                "STROBE_SBST_OBSERVE": "yes",
+                "STROBE_SBST_TYPE1": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "sbst_end_timeout", "type": "value", "value": "1000" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses"
+        },
+        "fault-simulation-zoix": {
+            "description": "Run the fault simulation (Gate-level) with Z01X",
+            "target": "zoix-fault-simulation",
+            "sources": [ "technology", "gate", "testbench", "strobe" ],
+            "configuration": {
+                "faults_file": "sources/zoix/faults-sbst1-dut.sff",
+                "strobe_file": "sources/zoix/untestability.fstrobe",
+                "init_script": "sources/zoix/initialize-testbench.tcl",
+                "fsim_script": "sources/zoix/fault-simulation.fmsh",
+                "memory_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.hex",
+                "coverage_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.coverage",
+                "summary_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.summary"
+            },
+            "defines": {
+                "STROBE_TIMEOUT": "yes",
+                "STROBE_SBST_OBSERVE": "yes",
+                "STROBE_SBST_TYPE1": "yes",
+                "MEMORY_ENABLE_DEBUG": "yes"
+            },
+            "plusargs": [
+                { "name": "timeout", "type": "value", "value": "10000" },
+                { "name": "log_debug", "type": "value", "value": "yes" },
+                { "name": "memory_debug", "type": "value", "value": "yes" },
+                { "name": "sbst_end_timeout", "type": "value", "value": "1000" }
+            ],
+            "plusargs_file": "output/picorv32-rv32im-zicsr-zicntr-xqregs-xtimer/sbst.addresses"
+        }
+    }
+}
