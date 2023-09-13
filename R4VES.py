@@ -18,7 +18,7 @@ def to_absolute_path(path: Union[pathlib.Path, str]) -> str:
     return f'{pathlib.Path(path).absolute()}'
 
 
-def run_command(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tuple[str, str]], cmd: List[str]) -> None:
+def run_command(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tuple[str, str]], task: List[str]) -> None:
     """ Runs the command specified in the CMD parameter with the environment of the ENV parameter.
 
         A RuntimeException is thrown if the command returns a status code other than 0.
@@ -26,7 +26,7 @@ def run_command(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tup
         A NAME.command and NAME.env file will be created inside the logs path provided
         to later be able to trace the executed command and its environment.
     """
-    command = ' '.join([str(item) for item in cmd])
+    command = ' '.join([str(item) for item in task])
     environment = collections.OrderedDict([*os.environ.items(), *env])
 
     with open(logs / f'{name}.command', 'at', encoding='utf-8') as command_file:
@@ -61,7 +61,7 @@ def run_command(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tup
     return (return_code == 0)
 
 
-def run_tool(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tuple[str, str]], cmd: List[str]) -> None:
+def run_tool(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tuple[str, str]], task: List[str]) -> None:
     """ Runs the tool specified in the CMD parameter with the environment of the ENV parameter.
         The behaviour is similar to the run_command function except that a tool lookup and mapping is done.
 
@@ -74,20 +74,20 @@ def run_tool(name: str, logs: pathlib.Path, path: pathlib.Path, env: List[Tuple[
         - %DATA_DIR%: This is the absolute, current directory of R4VES outside of the container
         - %WORK_DIR%: This is the commands working directory mapped to inside the container
     """
-    tool = cmd[0]
+    tool = task[0]
     if len(tool) >= 2 and tool.startswith('"') and tool.endswith('"'):
         tool = tool[1:-1]
 
     if tool in tools_config['native-commands']:
         mapped_tool = tools_config['native-commands'][tool]
-        mapped_task = cmd[1:]
+        mapped_task = task[1:]
     elif tool in tools_config['docker-commands']:
         # Don't map DATA_DIR with to_absolute_* as we don't want to transform it into a docker path
         mapped_tool = tools_config['docker-commands'][tool]
         mapped_tool = [part.replace('%DATA_DIR%', f'{pathlib.Path(".").absolute()}') for part in mapped_tool]
         mapped_tool = [part.replace('%WORK_DIR%', to_absolute_path(path)) for part in mapped_tool]
 
-        mapped_task = cmd[1:]
+        mapped_task = task[1:]
         mapped_task = [part.replace(f'{pathlib.Path(".").absolute()}', tools_config['docker-mount']) for part in mapped_task]
     else:
         raise ValueError(f'Could not find tool {tool} in the tools configuration')
