@@ -46,20 +46,20 @@ module tb_ram_generic
 	reg [7:0] memory [0 : 2**`MEMORY_ADDRESS_BITS];
 
 	wire  [31:0] port_a_read_data_ungated = {
-		memory[port_a_address + 32'd 0],
-		memory[port_a_address + 32'd 1],
+		memory[port_a_address + 32'd 3],
 		memory[port_a_address + 32'd 2],
-		memory[port_a_address + 32'd 3]
+		memory[port_a_address + 32'd 1],
+		memory[port_a_address + 32'd 0]
 	};
 	reg   [31:0] port_a_read_data_buffer = 32'h 00000000;
 	assign port_a_read_data = port_a_read_data_buffer;
 
 `ifdef MEMORY_DUAL_PORT
 	wire  [31:0] port_b_read_data_ungated = {
-		memory[port_b_address + 32'd 0],
-		memory[port_b_address + 32'd 1],
+		memory[port_b_address + 32'd 3],
 		memory[port_b_address + 32'd 2],
-		memory[port_b_address + 32'd 3]
+		memory[port_b_address + 32'd 1],
+		memory[port_b_address + 32'd 0]
 	};
 	reg   [31:0] port_b_read_data_buffer = 32'h 00000000;
 	assign port_b_read_data = port_b_read_data_buffer;
