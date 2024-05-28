@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "CAD Group, Politecnico di Torino"
+  given-names:
+- family-names: "University of Freiburg"
+  given-names:
+title: "R4VES: RISC-V Environment For Simulations"
+version: 1.0
+date-released: 2023-5-27
+url: "https://github.com/cad-polito-it/r4ves"
